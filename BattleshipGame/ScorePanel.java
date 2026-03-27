@@ -16,7 +16,7 @@ class ScorePanel extends JPanel {
     ScorePanel(Model model) {
         this.model = model;
         setLayout(new BorderLayout(8, 8));
-        setBorder(BorderFactory.createEmptyBorder(10, 16, 10, 16));
+        setBorder(BorderFactory.createEmptyBorder(6, 12, 6, 12));
         setBackground(new Color(15, 25, 50));
 
         JPanel top = new JPanel(new BorderLayout(12, 0));
@@ -28,7 +28,7 @@ class ScorePanel extends JPanel {
 
         turnLabel = new JLabel("BATTLESHIP", SwingConstants.CENTER);
         turnLabel.setForeground(Color.WHITE);
-        turnLabel.setFont(new Font("Arial", Font.BOLD, 20));
+        turnLabel.setFont(new Font("Arial", Font.BOLD, 16));
 
         enemyLabel = new JLabel();
         enemyLabel.setForeground(new Color(255, 180, 160));
@@ -39,20 +39,24 @@ class ScorePanel extends JPanel {
         top.add(turnLabel, BorderLayout.CENTER);
         top.add(enemyLabel, BorderLayout.EAST);
 
-        Font small = new Font("Monospaced", Font.PLAIN, 11);
-        yourStatus = new JTextArea(6, 22);
+        Font small = new Font("Monospaced", Font.PLAIN, 10);
+        yourStatus = new JTextArea(5, 20);
         yourStatus.setEditable(false);
         yourStatus.setFont(small);
         yourStatus.setBackground(new Color(12, 18, 35));
         yourStatus.setForeground(new Color(200, 210, 240));
         yourStatus.setBorder(new EmptyBorder(4, 6, 4, 6));
+        yourStatus.setLineWrap(false);
+        yourStatus.setWrapStyleWord(false);
 
-        enemyStatus = new JTextArea(6, 22);
+        enemyStatus = new JTextArea(5, 20);
         enemyStatus.setEditable(false);
         enemyStatus.setFont(small);
         enemyStatus.setBackground(new Color(12, 18, 35));
         enemyStatus.setForeground(new Color(240, 210, 200));
         enemyStatus.setBorder(new EmptyBorder(4, 6, 4, 6));
+        enemyStatus.setLineWrap(false);
+        enemyStatus.setWrapStyleWord(false);
 
         JPanel mid = new JPanel(new GridLayout(1, 2, 8, 0));
         mid.setOpaque(false);
@@ -61,14 +65,14 @@ class ScorePanel extends JPanel {
         JLabel yl = new JLabel("Your ships");
         yl.setForeground(Color.LIGHT_GRAY);
         leftWrap.add(yl, BorderLayout.NORTH);
-        leftWrap.add(new JScrollPane(yourStatus), BorderLayout.CENTER);
+        leftWrap.add(yourStatus, BorderLayout.CENTER);
 
         JPanel rightWrap = new JPanel(new BorderLayout());
         rightWrap.setOpaque(false);
         JLabel er = new JLabel("Enemy (what you know)");
         er.setForeground(Color.LIGHT_GRAY);
         rightWrap.add(er, BorderLayout.NORTH);
-        rightWrap.add(new JScrollPane(enemyStatus), BorderLayout.CENTER);
+        rightWrap.add(enemyStatus, BorderLayout.CENTER);
 
         mid.add(leftWrap);
         mid.add(rightWrap);
@@ -108,6 +112,7 @@ class ScorePanel extends JPanel {
             }
         }
         yourStatus.setText(y.toString());
+        yourStatus.setCaretPosition(0);
 
         StringBuilder e = new StringBuilder();
         for (Model.ShipType t : order) {
@@ -119,6 +124,7 @@ class ScorePanel extends JPanel {
             }
         }
         enemyStatus.setText(e.toString());
+        enemyStatus.setCaretPosition(0);
     }
 
     private static String label(Model.ShipType t) {

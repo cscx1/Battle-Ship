@@ -171,55 +171,55 @@ public class Model {
         return false;
     }
 
-    public void setLog(String logMessage) {
+    public synchronized void setLog(String logMessage) {
         this.logMessage = logMessage;
     }
 
-    public String getLog() {
+    public synchronized String getLog() {
         return logMessage;
     }
 
-    public boolean getCanMoveShips() {
+    public synchronized boolean getCanMoveShips() {
         return canMoveShips;
     }
 
-    public void setCanMoveShips(boolean canMoveShips) {
+    public synchronized void setCanMoveShips(boolean canMoveShips) {
         this.canMoveShips = canMoveShips;
     }
 
-    public int getScore() {
+    public synchronized int getScore() {
         return hitsLandedOnEnemy;
     }
 
-    public int getYourShipsLeft() {
+    public synchronized int getYourShipsLeft() {
         return 5 - yourShipsSunk;
     }
 
-    public int getEnemyShipsLeft() {
+    public synchronized int getEnemyShipsLeft() {
         return 5 - enemyShipsSunk;
     }
 
-    public CellStatus incomingAt(int row, int col) {
+    public synchronized CellStatus incomingAt(int row, int col) {
         return incomingOnYou[row][col];
     }
 
-    public CellStatus theirCell(int row, int col) {
+    public synchronized CellStatus theirCell(int row, int col) {
         return theirBoard[row][col];
     }
 
-    public ShipType yourCell(int row, int col) {
+    public synchronized ShipType yourCell(int row, int col) {
         return yourBoard[row][col];
     }
 
-    public boolean isPlayersTurn() {
+    public synchronized boolean isPlayersTurn() {
         return playerMove;
     }
 
-    public boolean isFleetReady() {
+    public synchronized boolean isFleetReady() {
         return typesStillInDock.isEmpty() && fleetOnBoard.size() == 5;
     }
 
-    public boolean shipTypeAvailable(ShipType t) {
+    public synchronized boolean shipTypeAvailable(ShipType t) {
         return typesStillInDock.contains(t);
     }
 
@@ -366,7 +366,7 @@ public class Model {
      * Which segment this cell is along the ship (0 = start of the ship: left end if horizontal,
      * top end if vertical). Matches how the reference project maps Carrier1…N onto cells.
      */
-    public int segmentIndexAt(int row, int col) {
+    public synchronized int segmentIndexAt(int row, int col) {
         Ship s = shipAt(row, col);
         if (s == null) {
             return 0;
@@ -385,7 +385,7 @@ public class Model {
         return row - minRow;
     }
 
-    public Ship getShipCovering(int row, int col) {
+    public synchronized Ship getShipCovering(int row, int col) {
         return shipAt(row, col);
     }
 

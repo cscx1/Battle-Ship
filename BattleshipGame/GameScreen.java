@@ -9,6 +9,7 @@ public class GameScreen extends JFrame {
     private final JLabel statusLabel;
     private final ScorePanel scorePanel;
     private final SidePanel sidePanel;
+    private final FleetDockPanel fleetDockPanel;
     private final OceanPanel oceanPanel;
     private boolean gameOverDialogShown;
 
@@ -30,17 +31,23 @@ public class GameScreen extends JFrame {
 
         scorePanel = new ScorePanel(model);
         oceanPanel = new OceanPanel(controller);
-        sidePanel = new SidePanel(controller, orientLabel);
+        sidePanel = new SidePanel(controller);
+        fleetDockPanel = new FleetDockPanel(controller, orientLabel);
 
         JPanel oceanWrapper = new JPanel(new BorderLayout(0, 4));
         oceanWrapper.setBackground(new Color(20, 30, 55));
         oceanWrapper.add(oceanPanel, BorderLayout.CENTER);
         oceanWrapper.add(orientLabel, BorderLayout.SOUTH);
 
+        JPanel playRow = new JPanel(new BorderLayout());
+        playRow.setBackground(new Color(20, 30, 55));
+        playRow.add(oceanWrapper, BorderLayout.CENTER);
+        playRow.add(sidePanel, BorderLayout.EAST);
+
         JPanel centerArea = new JPanel(new BorderLayout());
         centerArea.setBackground(new Color(20, 30, 55));
-        centerArea.add(oceanWrapper, BorderLayout.CENTER);
-        centerArea.add(sidePanel, BorderLayout.EAST);
+        centerArea.add(playRow, BorderLayout.CENTER);
+        centerArea.add(fleetDockPanel, BorderLayout.SOUTH);
 
         JPanel statusBar = new JPanel(new BorderLayout());
         statusBar.setBackground(new Color(10, 10, 25));
@@ -56,7 +63,7 @@ public class GameScreen extends JFrame {
 
         add(root);
         pack();
-        setMinimumSize(new Dimension(920, 640));
+        setMinimumSize(new Dimension(880, 760));
         setLocationRelativeTo(null);
 
         model.setOnUpdate(this::refreshFromModel);
@@ -68,7 +75,9 @@ public class GameScreen extends JFrame {
         SoundEffects.play(model.takeSoundCue());
         scorePanel.syncFromModel();
         sidePanel.syncFromModel();
+        fleetDockPanel.syncFromModel();
         oceanPanel.rebuildPieces();
+        sidePanel.repaint();
         statusLabel.setText(model.getLog());
         if (model.isGameOver() && !gameOverDialogShown) {
             gameOverDialogShown = true;
