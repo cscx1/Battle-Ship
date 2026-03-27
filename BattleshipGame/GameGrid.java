@@ -2,39 +2,36 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
-the grid is a square of cells. we need two kinds of conversion: from
-mouse position (pixels) to which cell was clicked, and from cell index
-to pixel position so we can draw things (like shots or ship segments) in
-the right place.
+ * Draws the water grid and converts between pixel coords and cell indices.
+ * Child components (ship cells, hit markers) use the same coordinate system.
  */
 class GameGrid extends JComponent {
-    int numOfCells;
-    int boardWidth, boardHeight;
-    int top, left;
-    int cellWidth, cellHeight;
-    int strokeSize = 2;
-    Model gameState;
+    final int numOfCells;
+    final int boardWidth;
+    final int boardHeight;
+    private final int top;
+    private final int left;
+    private final int cellWidth;
+    private final int cellHeight;
+    private final int strokeSize = 2;
 
-    GameGrid(int numOfCells, int boardWidth, int boardHeight, Point topLeft, Model gameState) {
+    GameGrid(int numOfCells, int boardWidth, int boardHeight, Point topLeft) {
         this.numOfCells = numOfCells;
         this.boardWidth = boardWidth;
         this.boardHeight = boardHeight;
         left = topLeft.x + strokeSize;
         top = topLeft.y + strokeSize;
-        this.cellHeight = boardHeight / numOfCells;
-        this.cellWidth = boardWidth / numOfCells;
-        this.gameState = gameState;
+        cellHeight = boardHeight / numOfCells;
+        cellWidth = boardWidth / numOfCells;
     }
 
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
-        g2d.setColor(Color.BLACK);
         g2d.setStroke(new BasicStroke(strokeSize));
 
-        // fill each cell with a light blue so it looks like water (no image needed)
-        Color water = new Color(180, 220, 255);
+        Color water = new Color(160, 200, 240);
         for (int x = 0; x < numOfCells; x++) {
             for (int y = 0; y < numOfCells; y++) {
                 g2d.setColor(water);
@@ -42,8 +39,7 @@ class GameGrid extends JComponent {
             }
         }
 
-        // draw grid lines
-        g2d.setColor(Color.BLACK);
+        g2d.setColor(new Color(30, 50, 80));
         for (int i = 0; i <= numOfCells; i++) {
             g2d.drawLine(left + i * cellWidth, top, left + i * cellWidth, boardHeight + top);
         }
@@ -52,19 +48,16 @@ class GameGrid extends JComponent {
         }
     }
 
-    public int getCellWidth() {
+    int getCellWidth() {
         return cellWidth;
     }
 
-    public int getCellHeight() {
+    int getCellHeight() {
         return cellHeight;
     }
 
-    /**
-    converts a mouse position (in pixels) to the grid cell index [row, col].
-    returns [-1, -1] if the point is outside the grid.
-     */
-    public int[] getCellInside(Point mousePosition) {
+    /** Returns [row, col], or [-1,-1] if the point isn't on the grid. */
+    int[] getCellInside(Point mousePosition) {
         int col = (mousePosition.x - left) / cellWidth;
         int row = (mousePosition.y - top) / cellHeight;
         if (row < 0 || row >= numOfCells || col < 0 || col >= numOfCells) {
@@ -73,11 +66,8 @@ class GameGrid extends JComponent {
         return new int[] { row, col };
     }
 
-    /**
-    converts a cell index [row, col] to the pixel position (top-left of that
-    cell) so we can place a Shot or ShipSquare there.
-     */
-    public int[] getCellPosition(int[] cellIndex) {
+    /** Top-left pixel of a cell inside this component. */
+    int[] getCellPosition(int[] cellIndex) {
         int row = cellIndex[0];
         int col = cellIndex[1];
         if (row < 0 || row >= numOfCells || col < 0 || col >= numOfCells) {

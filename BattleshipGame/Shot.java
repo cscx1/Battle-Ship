@@ -2,8 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * a small visual for one shot result: red oval for hit, gray for miss.
- * we use the grid's getCellPosition so the oval is drawn in the right cell.
+ * Incoming fire on your ocean: red = hit on you, white = miss (per assignment).
  */
 class Shot extends JComponent {
     Model.CellStatus hitMiss;
@@ -25,7 +24,7 @@ class Shot extends JComponent {
         if (hitMiss == Model.CellStatus.HIT) {
             g.setColor(Color.RED);
         } else {
-            g.setColor(Color.LIGHT_GRAY);
+            g.setColor(Color.WHITE);
         }
         int w = gameGrid.getCellWidth() - 4;
         int h = gameGrid.getCellHeight() - 4;

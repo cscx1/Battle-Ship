@@ -2,28 +2,29 @@ import java.awt.Point;
 import java.util.ArrayList;
 
 /**
- * one ship is just a list of cell positions on the grid.
- * each position is a point (row, col). the full game uses this for
- * placement and for drag-to-move (comparing old vs new coords).
+ * One ship on your grid: which cells it spans and how many times it's been hit.
  */
 public class Ship {
-    // list of grid cells this ship occupies (as row, col)
-    public ArrayList<Point> xy_coords = new ArrayList<>();
+    public final Model.ShipType kind;
+    public final boolean horizontal;
+    public final ArrayList<Point> xy_coords = new ArrayList<>();
+    public int hitsTaken;
 
-    // used when dragging: tentative new positions before we check if the move is valid
-    public ArrayList<Point> new_xy_coords = new ArrayList<>();
-
-    public void setShipPoint(int x, int y, int index) {
-        xy_coords.set(index, new Point(x, y));
+    public Ship(Model.ShipType kind, boolean horizontal) {
+        this.kind = kind;
+        this.horizontal = horizontal;
     }
 
-    // for drag: set one of the proposed new positions. skeleton keeps this so the
-    // structure matches the full game.
-    public void setNewCoords(int index, Point p) {
-        if (index >= new_xy_coords.size()) {
-            new_xy_coords.add(p);
-        } else {
-            new_xy_coords.set(index, p);
+    public boolean occupies(int row, int col) {
+        for (Point p : xy_coords) {
+            if (p.x == row && p.y == col) {
+                return true;
+            }
         }
+        return false;
+    }
+
+    public boolean isSunk() {
+        return hitsTaken >= xy_coords.size();
     }
 }
