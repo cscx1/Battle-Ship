@@ -200,6 +200,7 @@ class FleetDockPanel extends JPanel {
             title.addMouseMotionListener(dragAdapter);
             orientHint.addMouseListener(pressAdapter);
             orientHint.addMouseMotionListener(dragAdapter);
+            rotateBtn.addMouseListener(pressAdapter);
         }
 
         void refreshEnabled() {

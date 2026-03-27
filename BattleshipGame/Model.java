@@ -300,7 +300,10 @@ public class Model {
         notifyUi();
     }
 
-    public synchronized boolean placeShipFromDock(ShipType type, int row, int col, boolean horizontal) {
+    /**
+     * Whether {@link #placeShipFromDock} would succeed for this anchor and orientation (no mutation).
+     */
+    public synchronized boolean canPlaceShipFromDock(ShipType type, int row, int col, boolean horizontal) {
         if (!canMoveShips || gameOver || !typesStillInDock.contains(type)) {
             return false;
         }
@@ -308,9 +311,14 @@ public class Model {
         if (!fits(row, col, len, horizontal)) {
             return false;
         }
-        if (overlapsExisting(row, col, len, horizontal, null)) {
+        return !overlapsExisting(row, col, len, horizontal, null);
+    }
+
+    public synchronized boolean placeShipFromDock(ShipType type, int row, int col, boolean horizontal) {
+        if (!canPlaceShipFromDock(type, row, col, horizontal)) {
             return false;
         }
+        int len = lengthOf(type);
         Ship s = new Ship(type, horizontal);
         applyShipCells(s, row, col, len, horizontal);
         fleetOnBoard.add(s);
@@ -318,6 +326,47 @@ public class Model {
         logMessage = named(type) + " placed.";
         notifyUi();
         return true;
+    }
+
+    /**
+     * Whether {@link #movePlacedShip} would succeed (same geometry as pressing on
+     * {@code (fromRow, fromCol)} and releasing on {@code (toRow, toCol)}). No mutation.
+     */
+    public synchronized boolean canMovePlacedShip(int fromRow, int fromCol, int toRow, int toCol) {
+        if (!canMoveShips || gameOver) {
+            return false;
+        }
+        Ship s = shipAt(fromRow, fromCol);
+        if (s == null) {
+            return false;
+        }
+        int dr = toRow - fromRow;
+        int dc = toCol - fromCol;
+        ArrayList<Point> oldCells = new ArrayList<>(s.xy_coords);
+        ArrayList<Point> nextCells = new ArrayList<>();
+        for (Point p : oldCells) {
+            nextCells.add(new Point(p.x + dr, p.y + dc));
+        }
+        for (Point p : nextCells) {
+            if (p.x < 0 || p.x >= boardSize || p.y < 0 || p.y >= boardSize) {
+                return false;
+            }
+        }
+        clearShipFromBoard(s);
+        try {
+            for (Point p : nextCells) {
+                if (yourBoard[p.x][p.y] != ShipType.EMPTY) {
+                    return false;
+                }
+            }
+            return true;
+        } finally {
+            for (Point o : oldCells) {
+                yourBoard[o.x][o.y] = s.kind;
+            }
+            s.xy_coords.clear();
+            s.xy_coords.addAll(oldCells);
+        }
     }
 
     private static String named(ShipType t) {
@@ -387,6 +436,15 @@ public class Model {
 
     public synchronized Ship getShipCovering(int row, int col) {
         return shipAt(row, col);
+    }
+
+    /** Immutable snapshot of cells occupied by the ship under this cell (for UI preview). */
+    public synchronized List<Point> getShipCellCoordsForPreview(int row, int col) {
+        Ship s = shipAt(row, col);
+        if (s == null) {
+            return null;
+        }
+        return new ArrayList<>(s.xy_coords);
     }
 
     public synchronized boolean movePlacedShip(int fromRow, int fromCol, int toRow, int toCol) {
